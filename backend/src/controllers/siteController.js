@@ -1,0 +1,2 @@
+const db=require('../config/database');
+exports.create=async(req,res,next)=>{try{const {siteName,latitude,longitude}=req.body;if(!siteName||latitude===undefined||longitude===undefined)return res.status(400).json({message:'Site name, latitude, and longitude are required'});const siteId=`SITE-${Date.now()}`;const result=await db.query('INSERT INTO site (siteid,sitename,latitude,longitude) VALUES ($1,$2,$3,$4) RETURNING siteid AS site_id,sitename AS site_name,latitude,longitude',[siteId,siteName,latitude,longitude]);res.status(201).json(result.rows[0])}catch(e){next(e)}};
