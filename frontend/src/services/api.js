@@ -15,6 +15,7 @@ export const api = {
   requests: () => request('/requests'),
   createRequest: payload => request('/requests', { method: 'POST', body: JSON.stringify(payload) }),
   approveRequest: id => request(`/requests/${id}/approve`, { method: 'POST' }),
+  extendRequest: (id, extraDays) => request(`/requests/${id}/extension`, { method: 'POST', body: JSON.stringify({ extraDays }) }),
   createSite: payload => request('/sites', { method: 'POST', body: JSON.stringify(payload) }),
   rfid: (action,payload) => request(`/${action}`, { method: 'POST', body: JSON.stringify(payload) }),
   customers: () => request('/customers'),
