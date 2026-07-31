@@ -1,0 +1,1 @@
+const r=require('express').Router(),c=require('../controllers/rfidController');r.post('/admin/rfid/dispatch',c.dispatch);r.post('/customer/rfid/delivery',c.delivery);r.post('/customer/rfid/return',c.returnStart);r.post('/admin/rfid/depot-return',c.depotReturn);r.post('/equipment/move/:target',c.move);r.get('/anomalies',c.anomalies);module.exports=r;

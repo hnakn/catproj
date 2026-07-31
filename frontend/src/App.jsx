@@ -1,122 +1,13 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { api } from './services/api'
+import './index.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+const Status=({v})=><span className={`status ${v}`}>{v}</span>
+const Table=({title,heads,rows})=><section className="panel"><div className="section-head"><div><h2>{title}</h2><p>Loaded from your database.</p></div></div><table><thead><tr>{heads.map(x=><th key={x}>{x}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i}>{r.map((x,j)=><td key={j}>{x}</td>)}</tr>)}</tbody></table></section>
+function Scanner({customerId}){const[tag,setTag]=useState(''),[lat,setLat]=useState(''),[lon,setLon]=useState(''),[mode,setMode]=useState(customerId?'customer/rfid/delivery':'admin/rfid/dispatch'),[out,setOut]=useState(null);const gps=Boolean(customerId)||mode==='admin/rfid/depot-return';const scan=async e=>{e.preventDefault();try{setOut(await api.rfid(mode,{rfidTag:tag,customerId,latitude:gps?lat:undefined,longitude:gps?lon:undefined}))}catch(x){setOut({status:'failed',steps:[x.message]})}};return <section className="panel request-form"><div className="section-head"><div><h2>RFID Scanner</h2><p>{gps?'Enter mock GPS coordinates for validation.':'CAT Depot · 300 metre validation radius'}</p></div></div><form onSubmit={scan}><label>Workflow<select value={mode} onChange={e=>setMode(e.target.value)}>{customerId?<><option value="customer/rfid/delivery">Confirm delivery</option><option value="customer/rfid/return">Initiate return</option></>:<><option value="admin/rfid/dispatch">Dispatch equipment</option><option value="admin/rfid/depot-return">Depot return</option></>}</select></label><label>RFID tag<input required value={tag} onChange={e=>setTag(e.target.value)} placeholder="RFID002"/></label>{gps&&<><label>Latitude<input required type="number" step="any" value={lat} onChange={e=>setLat(e.target.value)}/></label><label>Longitude<input required type="number" step="any" value={lon} onChange={e=>setLon(e.target.value)}/></label></>}<button className="primary">Scan RFID</button>{out&&<div className="timeline">{out.steps.map((x,i)=><p key={i}>✓ {x}</p>)}<b>Status: {out.status}</b></div>}</form></section>}
+function NewRequest({customerId,sites,done}){const[f,setF]=useState({siteId:sites[0]?.site_id||'',equipmentType:'excavator',startDate:'',endDate:''}),[msg,setMsg]=useState('');const send=async e=>{e.preventDefault();try{await api.createRequest({...f,customerId});setMsg('Request created.');setTimeout(done,500)}catch(x){setMsg(x.message)}};return <section className="panel request-form"><div className="section-head"><h2>New Equipment Request</h2></div><form onSubmit={send}><label>Site<select value={f.siteId} onChange={e=>setF({...f,siteId:e.target.value})}>{sites.map(x=><option key={x.site_id} value={x.site_id}>{x.site_name}</option>)}</select></label><label>Equipment type<select value={f.equipmentType} onChange={e=>setF({...f,equipmentType:e.target.value})}>{['excavator','loader','dozer','backhoe','grader'].map(x=><option key={x}>{x}</option>)}</select></label><label>Start date<input required type="date" onChange={e=>setF({...f,startDate:e.target.value})}/></label><label>End date<input required type="date" onChange={e=>setF({...f,endDate:e.target.value})}/></label><button className="primary">Create Request</button><small>{msg}</small></form></section>}
+function Rentals({items,refresh}){const[days,setDays]=useState({}),[msg,setMsg]=useState('');const extend=async r=>{try{const x=await api.extendRequest(r.request_id,Number(days[r.request_id]||1));setMsg(x.message);refresh()}catch(e){setMsg(e.message)}};return <section className="panel"><div className="section-head"><div><h2>Rented Equipment</h2><p>Request extra rental days if no later booking conflicts.</p></div></div>{msg&&<div className="message">{msg}</div>}<table><thead><tr><th>Equipment</th><th>Status</th><th>Site</th><th>End date</th><th>Extra days</th><th></th></tr></thead><tbody>{items.map(r=><tr key={r.request_id}><td>{r.equipment_name}</td><td><Status v={r.status}/></td><td>{r.site_name}</td><td>{r.end_date}</td><td><select value={days[r.request_id]||1} onChange={e=>setDays({...days,[r.request_id]:e.target.value})}>{[1,2,3,4,5,6,7].map(d=><option key={d}>{d}</option>)}</select></td><td><button className="primary" onClick={()=>extend(r)}>Request Extension</button></td></tr>)}</tbody></table></section>}
+function Layout({items,page,setPage,back,children}){return <div className="app-shell"><aside><div className="brand"><b>CAT</b><span>SMARTFLEET</span></div><nav>{items.map(x=><button key={x} className={page===x?'active':''} onClick={()=>setPage(x)}>{x}</button>)}</nav><button className="back" onClick={back}>← Switch portal</button></aside><main className="content">{children}</main></div>}
+function Admin({back}){const[p,setP]=useState('Overview'),[d,setD]=useState({equipment:[],requests:[],customers:[],dashboard:{}});const load=()=>Promise.all([api.equipment(),api.requests(),api.customers(),api.dashboard()]).then(([equipment,requests,customers,dashboard])=>setD({equipment,requests,customers,dashboard}));useEffect(()=>{load()},[]);let body=p==='Depot Scanner'?<Scanner/>:p==='Requests'?<Table title="Requests" heads={['Customer','Site','Equipment','Status','']} rows={d.requests.map(x=>[x.customer_name,x.site_name,x.equipment_type,<Status v={x.status}/>,x.status==='pending'?<button className="primary" onClick={()=>api.approveRequest(x.request_id).then(load)}>Approve</button>:''])}/>:p==='Customers'?<Table title="Customers" heads={['ID','Name','Sites']} rows={d.customers.map(x=>[x.customer_id,x.customer_name,x.sites])}/>:p==='Analytics'?<section className="panel customer-welcome"><h2>Analytics</h2><p>Coming soon.</p></section>:p==='Equipment'?<Table title="Equipment" heads={['Equipment','Type','Status']} rows={d.equipment.map(x=>[x.equipment_name,x.equipment_type,<Status v={x.status}/>])}/>:<><section className="stats three">{[['Total',d.dashboard.totalEquipment],['Available',d.dashboard.availableEquipment],['Active',d.dashboard.activeEquipment]].map(x=><div className="stat" key={x[0]}><p>{x[0]} equipment</p><strong>{x[1]||0}</strong></div>)}</section><Table title="Equipment" heads={['Equipment','Status']} rows={d.equipment.map(x=>[x.equipment_name,<Status v={x.status}/>])}/></>;return <Layout items={['Overview','Equipment','Requests','Customers','Analytics','Depot Scanner']} page={p} setPage={setP} back={back}><header><h1>{p}</h1></header>{body}</Layout>}
+function Customer({back}){const[p,setP]=useState('Home'),[cs,setCs]=useState([]),[id,setId]=useState(''),[d,setD]=useState(null);const load=()=>id&&api.customerPortal(id).then(setD);useEffect(()=>{api.customers().then(x=>{setCs(x);setId(x[0]?.customer_id)})},[]);useEffect(()=>{load()},[id]);let body=!d?<div className="loading">Loading...</div>:p==='Rented Equipment'?<Rentals items={d.equipment} refresh={load}/>:p==='New Request'?<NewRequest customerId={id} sites={d.sites} done={()=>{load();setP('My Requests')}}/>:p==='My Sites'?<Table title="My Sites" heads={['Site','Latitude','Longitude']} rows={d.sites.map(x=>[x.site_name,x.latitude,x.longitude])}/>:p==='RFID Scanner'?<Scanner customerId={id}/>:p==='My Requests'?<Table title="My Requests" heads={['Site','Equipment','Start','End','Status']} rows={d.requests.map(x=>[x.site_name,x.equipment_type,x.start_date,x.end_date,<Status v={x.status}/>])}/>:<section className="stats three"><div className="stat"><p>My sites</p><strong>{d.sites.length}</strong></div><div className="stat"><p>Rented equipment</p><strong>{d.equipment.length}</strong></div><div className="stat"><p>My requests</p><strong>{d.requests.length}</strong></div></section>;return <Layout items={['Home','My Sites','Rented Equipment','My Requests','New Request','RFID Scanner']} page={p} setPage={setP} back={back}><header><h1>{p}</h1><select value={id} onChange={e=>setId(e.target.value)}>{cs.map(x=><option key={x.customer_id} value={x.customer_id}>{x.customer_name}</option>)}</select></header>{body}</Layout>}
+export default function App(){const[r,setR]=useState('home');return r==='home'?<main className="landing"><div className="landing-logo"><b>CAT</b> SMARTFLEET</div><h1>Choose your workspace</h1><div className="role-cards"><button onClick={()=>setR('admin')}><h2>Admin portal</h2></button><button onClick={()=>setR('customer')}><h2>Customer portal</h2></button></div></main>:r==='admin'?<Admin back={()=>setR('home')}/>:<Customer back={()=>setR('home')}/>}
