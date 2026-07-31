@@ -21,4 +21,6 @@ export const api = {
   customers: () => request('/customers'),
   customerPortal: id => request(`/customers/${id}/portal`),
   telemetry: id => request(`/equipment/${id}/telemetry`),
+  adminNotifications: () => request('/notifications/admin'),
+  customerNotifications: id => request(`/notifications/customer/${id}`),
 }

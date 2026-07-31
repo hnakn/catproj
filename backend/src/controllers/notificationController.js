@@ -1,0 +1,4 @@
+const db=require('../config/database');
+const query=`SELECT r.requestid AS request_id,e.equipmentname AS equipment_name,c.customername AS customer_name,s.sitename AS site_name,r.enddate AS end_date,(r.enddate-CURRENT_DATE) AS days_remaining FROM request r JOIN equipment e ON e.equipmentid=r.assignedequipmentid JOIN customer c ON c.customerid=r.customerid JOIN site s ON s.siteid=r.siteid WHERE r.status IN ('approved','active') AND r.enddate BETWEEN CURRENT_DATE AND CURRENT_DATE+3`;
+exports.admin=async(req,res,next)=>{try{const result=await db.query(`${query} ORDER BY r.enddate,e.equipmentname`);res.json(result.rows)}catch(e){next(e)}};
+exports.customer=async(req,res,next)=>{try{const result=await db.query(`${query} AND r.customerid=$1 ORDER BY r.enddate,e.equipmentname`,[req.params.id]);res.json(result.rows)}catch(e){next(e)}};
