@@ -1,1 +1,57 @@
-.scan-result{grid-column:1/-1;border:1px solid #dce7de;border-radius:7px;background:#fbfdfb;padding:14px 16px}.scan-result.failed{border-color:#f0d5cf;background:#fffaf8}.scan-result-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;font-size:13px;font-weight:700;color:#29382f}.scan-result p{margin:8px 0;font-size:12px;color:#405046;display:flex;align-items:center;gap:8px}.scan-result i{width:17px;height:17px;border-radius:50%;display:grid;place-items:center;background:#e0f1e5;color:#207244;font-size:9px;font-style:normal;font-weight:800}.scan-result .failure-step{color:#a44231}.scan-result .failure-step i{background:#f7dfd9;color:#a44231}.status.free{background:#eaf0ec;color:#536b5e}.status.occupied{background:#fff5d9;color:#9e7800}.status.failed{background:#fff0eb;color:#bc5a43}.status.returning,.status.approved{background:#eef0ff;color:#4d55a0}
+/* FLEETBOT RFID Scanner Styling */
+.scan-result {
+  grid-column: 1 / -1;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  margin-top: 12px;
+}
+
+.scan-result.failed {
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+
+.scan-result-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.scan-result p {
+  margin: 10px 0;
+  font-size: 13px;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scan-result i {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #d1fae5;
+  color: #047857;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.scan-result .failure-step {
+  color: #be123c;
+}
+
+.scan-result .failure-step i {
+  background: #ffe4e6;
+  color: #be123c;
+}

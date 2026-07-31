@@ -1,5 +1,5 @@
 const db=require('../config/database');
-const DEPOT={name:'CAT Depot',latitude:11,longitude:76.9,radius:300};
+const DEPOT={name:'FLEETBOT Depot',latitude:11,longitude:76.9,radius:300};
 const distance=(a,b,c,d)=>{const R=6371000,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180;const q=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.atan2(Math.sqrt(q),Math.sqrt(1-q))};
 const anomaly=async(type,reason,equipmentid)=>{if(!equipmentid)return;await db.query('INSERT INTO anomaly (equipmentid,anomalytype,type,reason,timestamp) VALUES ($1,$2,$2,$3,NOW())',[equipmentid,type,reason])};
 const saveLocation=async(id,latitude,longitude)=>{const lat=Number(latitude),lon=Number(longitude);if(!Number.isFinite(lat)||!Number.isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)throw Object.assign(new Error('Enter a valid GPS latitude and longitude'),{status:400});await db.query('INSERT INTO equipmentlog (logid,equipmentid,latitude,longitude,runtimehours,idlehours,fuelconsumption,timestamp) VALUES ($1,$2,$3,$4,0,0,0,NOW())',[`LOG-${Date.now()}`,id,lat,lon]);return{latitude:lat,longitude:lon}};

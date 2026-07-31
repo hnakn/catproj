@@ -1,4 +1,4 @@
-# Caterpillar SmartFleet
+# FLEETBOT SmartFleet
 
 Full-stack equipment rental and fleet-monitoring foundation. The React dashboard runs independently with polished demo data; the Express API uses PostgreSQL via `pg` and supplies protected equipment and rental endpoints.
 
